@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          setFieldsABLDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../../setUp"
+
+
+// Extents of the domain.
+xMin                      $xMin1;
+yMin                      $yMin1;
+zMin                      $zMin1;
+
+xMax                      $xMax2;
+yMax                      $yMax2;
+zMax                      $zMax2;
+
+zRef                      $zMax1;
+
+// Specify if distance from wall should be used as z.
+useWallDistZ              false;
+scaleVelocityWithHeight   false;
+
+
+// Specify how to initialze the base velocity and temperature profile.
+//velocityInitType          "table";
+//velocityInitType          "log";
+velocityInitType          "geostrophic";
+//temperatureInitType       "table";
+temperatureInitType       "simple";
+
+// Maximum perturbation of streamwise/spanwise flow near surface.
+deltaU                    1.0;
+deltaV                    1.0;
+
+// Total periods of perturbations in streamwise/spanwise in the domain.
+Uperiods                  3.0;
+Vperiods                  108.0;
+
+// Percentage of domain height (zMax) where peak in perturbation 
+// magnitude occurs.
+zPeak                     #calc "5.0E-6*$zInversion";
+
+// Initial height of the center of the capping inversion.
+zInversion                $zInversion;
+
+// Width of the capping inversion.
+widthInversion            $inversionWidth;
+
+// Potential temperature at the bottom and top of the capping inversion.
+Tbottom                   $TBottom;
+Ttop                      $TTop;
+
+// Maximum temperature fluctuation size below capping inversion.
+TPrimeScale               0.0;
+
+// Height rate of change of potential temperature above the inversion.
+dTdz                      $TGradUpper;
+
+// Geostrophic wind speed magnitude.
+Ug                        15;
+
+// Geostrophic wind speed direction.
+UgDir                     300;
+
+// Aerodynamic roughness height of surface.
+z0                        0.35;
+
+// von Karman constant.
+kappa                     $kappa;
+
+// Vertical profile table.
+profileTable
+(
+//   z          U       V        T
+    (0.0 8.0 0.0 300.0)
+    (10000.0 8.0 0.0 330.0)
+);
+
+// Update internal field.
+updateInternalFields      true;
+
+// Update boundary field.
+updateBoundaryFields      false;
+
+// ************************************************************************* //

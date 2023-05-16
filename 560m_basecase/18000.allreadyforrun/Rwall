@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volSymmTensorField;
+    location    "0";
+    object      Rwall;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../setUp"
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform (0 0 0 0 0 0);
+
+boundaryField
+{
+    lower.1
+    {
+        type            SchumannGrotzbach;
+        kappa           $kappa;
+        z0              uniform $z0_onshore;
+        betaM           $betaM;
+        gammaM          $gammaM;
+        averageType     $wallModelAverageType;
+        value           uniform $Rwall;
+    }
+    upper.1
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+    west.1
+    {
+        type            cyclicAMI;
+    }
+    east.1
+    {
+        type            cyclicAMI;
+    }
+    north.1
+    {
+        type            cyclic;
+    }
+    south.1
+    {
+        type            cyclic;
+    }
+
+
+    lower.2.1
+    {
+        type            SchumannGrotzbach;
+        kappa           $kappa;
+        z0              uniform $z0_onshore;
+        betaM           $betaM;
+        gammaM          $gammaM;
+        averageType     $wallModelAverageType;
+        value           uniform $Rwall;
+    }
+    lower.2.2
+    {
+        type            SchumannGrotzbach;
+        kappa           $kappa;
+        z0              uniform $z0_offshore;
+        betaM           $betaM;
+        gammaM          $gammaM;
+        averageType     $wallModelAverageType;
+        value           uniform $Rwall;
+    }
+    upper.2
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+    west.2
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+    east.2
+    {
+        type            fixedValue;
+        value           uniform (0 0 0 0 0 0);
+    }
+    north.2
+    {
+        type            cyclic;
+    }
+    south.2
+    {
+        type            cyclic;
+    }
+}
+
+
+// ************************************************************************* //

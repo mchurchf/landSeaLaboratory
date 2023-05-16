@@ -1,0 +1,166 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../../setUp"
+
+
+
+
+convertToMeters 1.0;
+
+vertices        
+(
+    ( $xMin1  $yMin1    $zMin1)
+    ( $xMax1   $yMin1   $zMin1)
+    ( $xMax1   $yMax1   $zMin1)
+    ( $xMin1   $yMax1   $zMin1)
+    ( $xMin1   $yMin1   $zMax1)
+    ( $xMax1   $yMin1   $zMax1)
+    ( $xMax1   $yMax1   $zMax1)
+    ( $xMin1   $yMax1   $zMax1)
+
+    ( $xMin2   $yMin2   $zMin2)
+    ( $xMax2   $yMin2   $zMin2)
+    ( $xMax2   $yMax2   $zMin2)
+    ( $xMin2   $yMax2   $zMin2)
+    ( $xMin2   $yMin2   $zMax2)
+    ( $xMax2   $yMin2   $zMax2)
+    ( $xMax2   $yMax2   $zMax2)
+    ( $xMin2   $yMax2   $zMax2)
+);
+
+blocks          
+(
+    hex ( 0  1  2  3  4  5  6  7) ($nx1 $ny1 $nz1) simpleGrading (1 1 1)
+    hex ( 8  9 10 11 12 13 14 15) ($nx2 $ny2 $nz2) simpleGrading (1 1 1)
+);
+
+edges           
+(
+);
+
+boundary
+(
+//  Block 1
+    lower.1
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+        );
+    }
+    upper.1
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+    west.1.pre
+    { 
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    east.1.pre
+    {
+        type patch;
+        faces
+        (
+            (1 2 6 5)
+        );
+    }
+    north.1
+    { 
+        type cyclic;
+        neighbourPatch south.1;
+        faces
+        (
+            (3 7 6 2)
+        );
+    }
+    south.1
+    { 
+        type cyclic;
+        neighbourPatch north.1;
+        faces
+        (
+            (0 1 5 4)
+        );
+    }
+
+//  Block 2
+    lower.2.pre
+    {
+        type patch;
+        faces
+        (
+            (8 11 10 9)
+        );
+    }
+    upper.2
+    {
+        type patch;
+        faces
+        (
+            (12 13 14 15)
+        );
+    }
+    west.2.pre
+    {   
+        type patch;
+        faces
+        (
+            (8 12 15 11)
+        );
+    }
+    east.2
+    { 
+        type patch;
+        faces
+        (
+            (9 10 14 13)
+        );
+    }
+    north.2
+    { 
+        type cyclic;
+        neighbourPatch south.2;
+        faces
+        (
+            (11 15 14 10)
+        );
+    }
+    south.2
+    { 
+        type cyclic;
+        neighbourPatch north.2;
+        faces
+        (
+            (8 9 13 12)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

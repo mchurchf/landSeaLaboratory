@@ -1,0 +1,98 @@
+slicesMean
+{
+    type surfaces;
+    functionObjectLibs ( "libsampling.so" );
+    writeControl        adjustableRunTime;
+    writeInterval       500;
+    fields
+    (
+      UMean
+      UPrime2Mean
+      TMean
+      p_rghMean
+    );
+    interpolationScheme cellPoint;      // cell, cellPoint, cellPointCell
+    surfaceFormat             vtk;
+
+
+    surfaces
+    (
+        yNormal.5
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 5.001 0);
+                normalVector (0 1 0);
+            }
+            triangulate false;
+        }
+        zNormal.5
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 5.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+        zNormal.50
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 50.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+        zNormal.150
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 150.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+        zNormal.240
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 240.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+        zNormal.500
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 500.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+        zNormal.5000
+        {
+            type plane;
+            planeType pointAndNormal;
+            pointAndNormalDict
+            {
+                basePoint (0 0 5000.001);
+                normalVector (0 0 1);
+            }
+            triangulate false;
+        }
+    );
+}

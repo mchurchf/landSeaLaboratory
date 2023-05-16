@@ -1,0 +1,59 @@
+#!/bin/bash
+#SBATCH --ntasks=360
+#SBATCH --time=24:00:00
+#SBATCH --account=osw
+
+# User Input.
+startTime=0                            # Start time
+cores=$SLURM_NTASKS                    # Enter the number of cores you will preprocess on.
+runNumberStart=1                       # Enter the starting run number (useful for keeping track of restarts).
+runNumberEnd=1                         # Enter the ending run number (useful for keeping track of restarts).
+solver=superDeliciousVanilla           # Enter the name of the flow solver.
+
+
+
+echo "Starting OpenFOAM job at: " $(date)
+echo "using " $cores " cores"
+
+
+# Source the bash profile and then call the appropriate OpenFOAM version function
+# so that all the modules and environment variables get set.
+echo "Sourcing the bash profile, loading modules, and setting the OpenFOAM environment variables..."
+source /home/mchurchf/software-2021-02/environmentScripts/SOWFA-6-matt-latest.intel.intel-mpi.openfast-matt-v3.1.0-DP
+SOWFA-6-matt-latest.intel.intel-mpi.openfast-matt-v3.1.0-DP
+
+
+i=$runNumberStart
+while [ $i -le $runNumberEnd ]
+   do
+
+     echo "  Running run $i ..."
+
+     echo "   -Decomposing domain to $nCores.full_..."
+     decomposePar -fields > logs/log.decomposePar.fields 2>&1
+     cd system
+     rm decomposeParDict
+     ln -s decomposeParDict.run decomposeParDict
+     cd ../
+     decomposePar -cellDist -force > logs/log.decomposePar.run 2>&1
+
+     # Get the control dictionary for this particular run.
+     cd system
+
+     rm fvSolution
+     ln -s fvSolution.run fvSolution
+
+     rm controlDict
+     ln -s controlDict.$i controlDict
+
+     cd ..
+
+     # Run the solver.
+     echo "    -running the solver..."
+     srun -n $cores $solver -parallel > logs/log.$solver.$i 2>&1
+
+     let i=i+1
+
+  done
+
+echo "Ending OpenFOAM job at: " $(date)

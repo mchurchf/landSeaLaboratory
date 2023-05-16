@@ -1,0 +1,93 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      createPatchDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Do a synchronisation of coupled points after creation of any patches.
+// Note: this does not work with points that are on multiple coupled patches
+//       with transformations (i.e. cyclics).
+pointSync false;
+
+// Optional: Write cyclic matches into .obj format; defaults to false.
+writeCyclicMatch  false;
+
+// Patches to create.
+patches
+(
+    {
+        // Name of new patch
+        name west.2;
+
+        // Dictionary to construct new patch from
+        patchInfo
+        {
+            type            mappedPatch;
+            sampleMode      nearestPatchFace;
+            sampleRegion    region0;
+            samplePatch     west.1;
+            offset          ( -5040 0 0 );
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom patches;
+
+        // If constructFrom = set : name of faceSet
+        patches (west.2.pre);
+    }
+
+    {
+        // Name of new patch
+        name west.1;
+
+        // Dictionary to construct new patch from
+        patchInfo
+        {
+            type cyclicAMI;
+            neighbourPatch east.1;
+            transform      translational;
+            separationVector  (5040 0 0);
+            method          faceAreaWeightAMI;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom patches;
+
+        // If constructFrom = set : name of faceSet
+        patches (west.1.pre);
+    }
+
+    {
+        // Name of new patch
+        name east.1;
+
+        // Dictionary to construct new patch from
+        patchInfo
+        {
+            type cyclicAMI;
+            neighbourPatch west.1;
+            transform      translational;
+            separationVector  (-5040 0 0);
+            method          faceAreaWeightAMI;
+        }
+
+        // How to construct: either from 'patches' or 'set'
+        constructFrom patches;
+
+        // If constructFrom = set : name of faceSet
+        patches (east.1.pre);
+    }
+);
+
+// ************************************************************************* //

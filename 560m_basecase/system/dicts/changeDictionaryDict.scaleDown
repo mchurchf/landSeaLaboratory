@@ -1,0 +1,50 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.0.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../../setUp"
+
+dictionaryReplacement
+{
+
+    // Specify
+    // - all fvPatchFields with potential non-uniform values
+    // - all fvPatchFields originating from meshing
+    // - all fvPatchFields originating from mesh-redistribution
+
+    boundary
+    {
+    	 west.1
+         {
+             type            cyclicAMI;
+             separationVector ( 50.40 0 0 );
+         }
+         east.1
+         {
+             type            cyclicAMI;
+             separationVector ( -50.40 0 0 );
+         }
+         west.2
+         {
+             type            mappedPatch;
+             offset          ( -50.40 0 0 );
+         }
+
+    }
+
+
+
+}
+// ************************************************************************* //

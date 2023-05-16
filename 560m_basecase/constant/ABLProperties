@@ -1,0 +1,159 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          ABLProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../setUp"
+
+
+// Properties of the background forcing source term
+momentumSource
+{
+    type        "given";
+    inputType   "speedAndDirection";
+
+    //Relaxation factor (only used when type is "computed")
+    gain        0.7;
+
+    sourceHeightsMomentum
+    (
+        $windControlHeight
+    );
+    
+    sourceTableMomentumX
+    (
+        (    0.0 0.000701172511253)
+        (90000.0 0.000701172511253)
+    );
+
+    sourceTableMomentumY
+    (
+        (    0.0 0.001214466414362)
+        (90000.0 0.001214466414362)
+    );
+    
+    sourceTableMomentumZ
+    (
+        (    0.0 0.0)
+        (90000.0 0.0)
+    );
+}
+
+temperatureSource
+{
+    type        "given";
+
+    //Relaxation factor (only used when type is "computed")
+    gain        0.7;
+
+    sourceHeightsTemperature
+    (
+        $windControlHeight
+    );
+    
+    sourceTableTemperature
+    (
+        (    0.0 0.0)
+        (90000.0 0.0)
+    );
+}
+
+// Damping layer parameters.
+
+spongeList
+{
+    upperSponge
+    {
+        type             "Rayleigh";               // Type of sponge layer: "none" (Default), "Rayleigh" or "viscous".
+        patch            "upper";                  // Apply patch on a specific patch.
+        width            5000.0;                   // Width of the sponge layer (m). Set this variable is constant, or
+        dampCoeffMax     0.025;                    // Maximum damping coefficient, dimensions depend on type of damping:
+        cosFraction      1.0;                      // Fraction of the layer's width that has a smooth transition of viscosity
+        dampingComp      "vertical";               // Components to be damped: "horizontal" for x and y, or "vertical" for z
+                                                   //    if "horizontal" and "Rayleigh", Ux and Uy need to be specified
+    }
+
+    westSponge
+    {
+        type             "Rayleigh";                // Type of sponge layer: "none" (Default), "Rayleigh" or "viscous".
+        width            5000.0;                    // Width of the sponge layer (m). Set this variable is constant, or
+        dampCoeffMax     0.025;                     // Maximum damping coefficient, dimensions depend on type of damping:
+                                                    // Rayleigh (1/s),  viscous  (m^2/s)
+        cosFraction       1;                        // Fraction of the layer's width that has a smooth transition of viscosity
+                                                    //cosFractionTable is also available
+
+        dampingComp      "vertical";              // Components to be damped: "horizontal" for x and y, or "vertical" for z
+                                                    //    if "horizontal" and "Rayleigh", Ux and Uy need to be specified
+        Ux               10.0;                      // Sponge layer reference velocity in x direction (m/s).
+        Uy               0.0;                       // Sponge layer reference velocity in y direction (m/s).
+
+        // The settings below can be used instead of `patch`, if a more general layer is needed
+        startLocation    5040.0;                   // Start location of the sponge layer (m)
+        coordIndex       1;                         // Coordinate index: 0, 1 or 2 corresponding to yz, xz or xy slab.
+        direction        "stepDown";                  // Shape of damping function: "stepUp" increases smoothly from 0 to 1 in the
+
+        vertFilter              true;               // Vertical filter on side layers. Cannot be used on `upper`-type layers
+        vertFilterStartHeight   1000;                // Height where the filter should start. No damping under this height. *Table version available
+        vertFilterCosThickness  200;                // Thickness of the smooth vertical transition. *Table version available.
+        useWallDist             false;               // Whether the height used for the vertical filter is absolute or above-ground-level height
+                                                    // The wall dist value can be specified on a per-layer basis
+    }
+    eastSponge
+    {
+        type             "Rayleigh";               // Type of sponge layer: "none" (Default), "Rayleigh" or "viscous".
+        patch            "east";                  // Apply patch on a specific patch.
+        width            5000.0;                   // Width of the sponge layer (m). Set this variable is constant, or
+        dampCoeffMax     0.025;                    // Maximum damping coefficient, dimensions depend on type of damping:
+        cosFraction      1.0;                      // Fraction of the layer's width that has a smooth transition of viscosity
+        dampingComp      "vertical";               // Components to be damped: "horizontal" for x and y, or "vertical" for z
+                                                   //    if "horizontal" and "Rayleigh", Ux and Uy need to be specified
+        vertFilter              true;               // Vertical filter on side layers. Cannot be used on `upper`-type layers
+        vertFilterStartHeight   1000;                // Height where the filter should start. No damping under this height. *Table version available
+        vertFilterCosThickness  200;                // Thickness of the smooth vertical transition. *Table version available.
+        useWallDist             false;               // Whether the height used for the vertical filter is absolute or above-ground-level height
+                                                    // The wall dist value can be specified on a per-layer basis
+    }
+
+}
+
+
+
+// Properties of the Coriolis force
+planetaryRotationPeriod   $EarthPeriod;
+latitude                  $latitude;
+
+// Pressure
+perturbationPressureType  "rho0Split";
+
+
+updatePhiBoundariesOnRestart  false;
+
+
+//coupledInflowPatches    (west.1);
+
+
+// Write out postProcessing/sourceHistory
+writeSource             $writeSource;
+writeSourceInterval     $writeSourceInterval;
+
+
+// ************************************************************************* //

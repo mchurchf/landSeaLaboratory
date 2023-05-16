@@ -1,0 +1,42 @@
+#!/bin/bash
+#SBATCH --ntasks=18
+#SBATCH --time=2:00:00
+#SBATCH --account=osw
+
+# Source the bash profile and then call the appropriate OpenFOAM version function
+# so that all the modules and environment variables get set.
+##echo "Sourcing the bash profile, loading modules, and setting the OpenFOAM environment variables..."
+source /home/mchurchf/software-2021-02/environmentScripts/SOWFA-6-matt-latest.intel.intel-mpi.openfast-matt-v3.1.0-DP
+SOWFA-6-matt-latest.intel.intel-mpi.openfast-matt-v3.1.0-DP
+
+echo "Working directory is" $SLURM_SUBMIT_DIR
+echo "Job name is" $SLURM_JOB_NAME
+echo "Submit time is" $(squeue -u $USER -o '%30j %20V' | grep -e $SLURM_JOB_NAME | awk '{print $2}')
+echo "Starting OpenFOAM job at: " $(date)
+echo "using" $cores "core(s)"
+
+
+nCores=18
+nTranslations=6
+sourceCaseDir='/scratch/joniko/toy_cases/run_prec_560m_neutralabove/'
+
+##mkdir logs.mapFields
+
+##decomposePar -force -cellDist > logs/log.decomposePar 2>&1
+
+
+transformPoints -scale '(0.01 0.01 0.01)' > logs/log.transformPoints.scaleDown 2>&1
+
+changeDictionary -dict system/dicts/changeDictionaryDict.scaleDown -subDict dictionaryReplacement -enableFunctionEntries > logs/log.changeDictionary.scaleDown 2>&1
+
+source ./tile_function
+
+tiledMapFields $nTranslations $nCores -50.40 0 0 18000 $sourceCaseDir
+
+transformPoints -scale '(100.0 100.0 100.0)' > logs/log.transformPoints.scaleUp 2>&1
+
+changeDictionary -dict system/dicts/changeDictionaryDict.scaleUp -subDict dictionaryReplacement -enableFunctionEntries > logs/log.changeDictionary.scaleUp 2>&1
+
+echo "Ending OpenFOAM job at: " $(date)
+
+# **************************************************************************************************** #

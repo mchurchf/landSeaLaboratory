@@ -1,0 +1,56 @@
+#!/bin/bash
+
+
+nRefinementLayers=3
+
+
+# Make a directory for organizing the log files.
+if [ ! -d logs ]
+then
+    mkdir logs
+fi
+
+
+# Remove the initial conditions files, which will be replaced with
+# fresh copies later.
+rm -rf 18000
+
+
+# Build the base level 0 mesh with blockMesh
+blockMesh -dict system/dicts/blockMeshDict > logs/log.blockMesh 2>&1
+
+
+# Add the layered refinement
+i=$nRefinementLayers
+while [ $i -ge 1 ]
+do
+    topoSet -dict system/dicts/topoSetDict.layeredRefinement.$i > logs/log.topoSet.layeredRefinement.$i 2>&1
+    refineHexMesh local -overwrite > logs/log.refineHexMesh.layeredRefinement.$i 2>&1
+    let i=i-1
+done
+
+
+# Renumber the mesh to better organize the mesh sparseness
+renumberMesh -overwrite > logs/log.renumberMesh 2>&1
+
+
+### Create the cyclicAMI patches.
+createPatch -dict system/dicts/createPatchDict.cyclicAMI -overwrite > logs/log.createPatch.cyclicAMI 2>&1
+
+
+### Create the inlet/outlet lower boundaries.
+topoSet -dict system/dicts/topoSetDict.lowerSurfaces.2.1 > logs/log.topoSet.lowerSurfaces.2.1 2>&1
+topoSet -dict system/dicts/topoSetDict.lowerSurfaces.2.2 > logs/log.topoSet.lowerSurfaces.2.2 2>&1
+createPatch -dict system/dicts/createPatchDict.lowerSurfaces -overwrite > logs/log.createPatch.lowerSurfaces 2>&1
+
+
+## Make a fresh copy of the initial condiions.
+cp -rf 18000.allreadyforrun 18000
+
+
+## Initialize the flow.
+#setFieldsABL -dict system/dicts/setFieldsABLDict > logs/log.setFieldsABL 2>&1
+
+
+## Decompose the domain.
+#decomposePar -force -cellDist > logs/log.decomposePar 2>&1

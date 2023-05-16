@@ -1,0 +1,90 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       volScalarField;
+    location    "18000";
+    object      k;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include        "../setUp"
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0.1;
+
+boundaryField
+{
+    lower.1
+    {
+        type            zeroGradient;
+    }
+    upper.1
+    {
+        type            zeroGradient;
+    }
+    north.1
+    {
+        type            cyclic;
+    }
+    south.1
+    {
+        type            cyclic;
+    }
+    upper.2
+    {
+        type            zeroGradient;
+    }
+    east.2
+    {
+        type            inletOutlet;
+        inletValue      uniform 0.1;
+        value           uniform 0.1;
+    }
+    north.2
+    {
+        type            cyclic;
+    }
+    south.2
+    {
+        type            cyclic;
+    }
+    west.2
+    {
+        type            mapped;
+        field           k;
+        setAverage      0;
+        average         0;
+        interpolationScheme cell;
+        value           uniform 0.1;
+    }
+    west.1
+    {
+        type            cyclicAMI;
+        value           uniform 0.1;
+    }
+    east.1
+    {
+        type            cyclicAMI;
+        value           uniform 0.1;
+    }
+    lower.2.1
+    {
+        type            zeroGradient;
+    }
+    lower.2.2
+    {
+        type            zeroGradient;
+    }
+}
+
+
+// ************************************************************************* //
